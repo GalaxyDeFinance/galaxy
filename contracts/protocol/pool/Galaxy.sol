@@ -164,9 +164,9 @@ contract Galaxy is IGalaxy {
 
     /**
      * @param destination: the ether receiver address.
-     * @param value: the ether value, in wei.
-     * @param vs, rs, ss: the signatures
-    */
+   * @param value: the ether value, in wei.
+   * @param vs, rs, ss: the signatures
+   */
     function spend(address destination, uint256 value, uint8[] calldata vs, bytes32[] calldata rs, bytes32[] calldata ss) external {
         require(destination != address(this), "Not allow sending to yourself");
         require(address(this).balance >= value && value > 0, "balance or spend value invalid");
@@ -180,10 +180,10 @@ contract Galaxy is IGalaxy {
 
     /**
      * @param erc20contract: the erc20 contract address.
-     * @param destination: the token receiver address.
-     * @param value: the token value, in token minimum unit.
-     * @param vs, rs, ss: the signatures
-    */
+   * @param destination: the token receiver address.
+   * @param value: the token value, in token minimum unit.
+   * @param vs, rs, ss: the signatures
+   */
     function spendERC20(address destination, address erc20contract, uint256 value, uint8[] calldata vs, bytes32[] calldata rs, bytes32[] calldata ss) external {
         require(destination != address(this), "Not allow sending to yourself");
         //transfer erc20 token
@@ -195,11 +195,9 @@ contract Galaxy is IGalaxy {
         emit SpentERC20(erc20contract, destination, value);
     }
 
-    /**
-     * @param galaxyPool: the galaxy pool address
-     * @param assetAmount: the number of tokens that need to be converted into lp, remaining tokens will be sent directly to the galaxy pool
-     * @param vs, rs, ss: the signatures
-    */
+    // @galaxyPool: the galaxy pool address.
+    // @assetAmount: the number of tokens that need to be converted into lp, remaining tokens will be sent directly to the galaxy pool
+    // @vs, rs, ss: the signatures
     function liquidatedAssets(address galaxyPool, uint256 assetAmount, uint8[] calldata vs, bytes32[] calldata rs, bytes32[] calldata ss) external {
         require(galaxyPool != address(0), "Cannot be zero address");
         require(_validSignature(this.liquidatedAssets.selector, borrowInfo.tokenAddress, galaxyPool, assetAmount, vs, rs, ss), "invalid signatures");
@@ -255,6 +253,7 @@ contract Galaxy is IGalaxy {
         emit Crossed(erc20contract, destination, value);
     }
 
+    //This is usually for some emergent recovery, for example, recovery of NTFs, etc.
     function spendAny(address destination, uint256 value, uint8[] calldata vs, bytes32[] calldata rs, bytes32[] calldata ss, bytes calldata data) external {
         require(destination != address(this), "Not allow sending to yourself");
         require(_validSignatureAny(this.spendAny.selector, destination, value, data, vs, rs, ss), "invalid signatures");
@@ -265,6 +264,8 @@ contract Galaxy is IGalaxy {
         emit SpentAny(destination, value);
     }
 
+    // Confirm that the signature triplets (v1, r1, s1) (v2, r2, s2) ...
+    // authorize a spend of this contract's funds to the given destination address.
     function _validSignature(bytes4 selector, address erc20Contract, address destination, uint256 value, uint8[] calldata vs, bytes32[] calldata rs, bytes32[] calldata ss) private view returns (bool) {
         require(vs.length == rs.length);
         require(rs.length == ss.length);
@@ -280,6 +281,8 @@ contract Galaxy is IGalaxy {
         return true;
     }
 
+    // Confirm that the signature triplets (v1, r1, s1) (v2, r2, s2) ...
+    // authorize a spend of this contract's funds to the given destination address.
     function _validSignatureAny(bytes4 selector, address destination, uint256 value, bytes calldata data, uint8[] calldata vs, bytes32[] calldata rs, bytes32[] calldata ss) private view returns (bool) {
         require(vs.length == rs.length);
         require(rs.length == ss.length);
