@@ -1,1 +1,1 @@
-# Galaxy Contract CodeAudit
+# GalaxyFi Contract
